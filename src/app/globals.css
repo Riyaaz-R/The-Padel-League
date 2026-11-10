@@ -53,3 +53,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .popup-bar-paused { animation-play-state: paused; }
 @keyframes popup-bar { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 @media (prefers-reduced-motion: reduce) { .popup-in, .popup-bar { animation: none; } }
+
+.fade-in { animation: fade-in 600ms ease-out; }
+@keyframes fade-in { from { opacity: 0; transform: translateY(0.6vh); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .fade-in { animation: none; } }

@@ -20,7 +20,7 @@ export const viewport: Viewport = { themeColor: '#07090b', width: 'device-width'
 
 const NAV = [
   ['/fixtures', 'Fixtures'], ['/tables', 'Tables'], ['/knockouts', 'Knockouts'], ['/teams', 'Teams'],
-  ['/players', 'Players'], ['/live', 'Live'], ['/lucky-draw', 'Lucky Draw'], ['/rules', 'Rules'], ['/about', 'About'],
+  ['/players', 'Players'], ['/live', 'Live'], ['/tv', 'TV Mode'], ['/lucky-draw', 'Lucky Draw'], ['/rules', 'Rules'], ['/about', 'About'],
 ] as const;
 
 export const dynamic = 'force-dynamic'; // the announcement banner is read per request

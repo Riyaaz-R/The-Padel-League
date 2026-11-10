@@ -14,7 +14,7 @@ const SHOW_MS = 5_000; // for 5 seconds
  */
 export function LuckyDrawPopup() {
   const path = usePathname();
-  const disabled = path.startsWith('/admin') || path.startsWith('/staff') || path.startsWith('/lucky-draw');
+  const disabled = path.startsWith('/admin') || path.startsWith('/staff') || path.startsWith('/lucky-draw') || path.startsWith('/tv'); // the TV screen has its own Lucky Draw bar
   const [open, setOpen] = useState(false);
   const [paused, setPaused] = useState(false);
   const pausedRef = useRef(false);

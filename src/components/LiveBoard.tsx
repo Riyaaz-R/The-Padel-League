@@ -26,18 +26,18 @@ export function ConnectionBadge({ online, updated }: { online: boolean; updated:
 export function FixtureLive({ f, big = false }: { f: SnapFixture; big?: boolean }) {
   return (
     <section className="card-lime">
-      <div className="mb-2 flex items-center justify-between text-xs uppercase tracking-widest text-bone/70">
+      <div className={`flex items-center justify-between uppercase tracking-widest text-bone/70 ${big ? "mb-[0.6vh] text-[1.6vh]" : "mb-2 text-xs"}`}>
         <span>{f.court ? `Court ${f.court}` : 'Court TBC'}{f.time ? ` · ${f.time}` : ''}</span>
         {f.status === 'live' ? <span className="font-bold text-red-400"><span className="live-dot">●</span> LIVE</span> : f.status === 'final' ? <span className="font-bold text-lime">FINAL</span> : <span>{f.status === 'scheduled' ? 'Upcoming' : f.status.replace('_', ' ')}</span>}
       </div>
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-        <div className="flex items-center gap-2"><Image src={f.home.logo} alt="" width={64} height={64} className={`rounded-xl ${big ? 'h-[6vh] w-[6vh]' : 'h-12 w-12'}`} /><span className={`display leading-none ${big ? 'text-[3.2vh]' : 'text-xl'}`}>{f.home.name}</span></div>
-        <div className={`display tabular-nums ${big ? 'text-[7vh]' : 'text-4xl'}`}>{f.homePts}<span className="mx-2 text-lime">–</span>{f.awayPts}</div>
-        <div className="flex items-center justify-end gap-2 text-right"><span className={`display leading-none ${big ? 'text-[3.2vh]' : 'text-xl'}`}>{f.away.name}</span><Image src={f.away.logo} alt="" width={64} height={64} className={`rounded-xl ${big ? 'h-[6vh] w-[6vh]' : 'h-12 w-12'}`} /></div>
+        <div className="flex items-center gap-2"><Image src={f.home.logo} alt="" width={64} height={64} className={`rounded-xl ${big ? 'h-[5vh] w-[5vh]' : 'h-12 w-12'}`} /><span className={`display leading-none ${big ? 'text-[2.8vh]' : 'text-xl'}`}>{f.home.name}</span></div>
+        <div className={`display tabular-nums ${big ? 'text-[5.4vh]' : 'text-4xl'}`}>{f.homePts}<span className="mx-2 text-lime">–</span>{f.awayPts}</div>
+        <div className="flex items-center justify-end gap-2 text-right"><span className={`display leading-none ${big ? 'text-[2.8vh]' : 'text-xl'}`}>{f.away.name}</span><Image src={f.away.logo} alt="" width={64} height={64} className={`rounded-xl ${big ? 'h-[5vh] w-[5vh]' : 'h-12 w-12'}`} /></div>
       </div>
-      <ul className="mt-3 space-y-1">
+      <ul className={big ? "mt-[0.8vh] space-y-[0.4vh]" : "mt-3 space-y-1"}>
         {f.pairings.map((p) => (
-          <li key={p.slot} className={`grid grid-cols-[auto_1fr_auto_1fr] items-center gap-2 rounded-lg bg-ink/60 px-2 py-1 ${big ? 'text-[2.4vh]' : 'text-sm'}`}>
+          <li key={p.slot} className={`grid grid-cols-[auto_1fr_auto_1fr] items-center gap-2 rounded-lg bg-ink/60 px-2 py-[0.3vh] ${big ? 'text-[1.95vh] leading-tight' : 'text-sm'}`}>
             <span className={`tag ${COLOUR[p.slot]}`}>{LABEL[p.slot]}</span>
             <span className={p.winner === 'home' ? 'font-bold text-lime' : ''}>{p.home}</span>
             <span className="display text-center tabular-nums">

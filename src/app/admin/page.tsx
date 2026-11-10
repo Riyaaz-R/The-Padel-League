@@ -35,7 +35,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
         <form action={addAnnouncement} className="card space-y-2"><h2 className="text-xl">Announcement banner</h2>
           <input name="text" maxLength={240} defaultValue={s.announcement} className="input" placeholder="Leave empty to clear" /><button className="btn">Publish</button></form>
         <form action={setTvScene} className="card space-y-2"><h2 className="text-xl">TV scene</h2>
-          <select name="scene" defaultValue={s.tvScene ?? ''} className="input"><option value="">Auto-rotate</option>{['live', 'standings', 'next', 'results', 'bracket'].map((x) => <option key={x}>{x}</option>)}</select><button className="btn">Apply</button></form>
+          <select name="scene" defaultValue={s.tvScene ?? ''} className="input"><option value="">Live scores only (default)</option><option value="rotate">Rotate: scores, tables, up next, results, bracket</option>{['standings', 'next', 'results', 'bracket'].map((x) => <option key={x} value={x}>Show only: {x}</option>)}</select><button className="btn">Apply</button></form>
         <form action={addPenalty} className="card space-y-2"><h2 className="text-xl">Point penalty</h2>
           <select name="teamId" className="input">{TEAMS.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select>
           <input name="points" type="number" min={1} className="input" placeholder="Points" /><input name="reason" className="input" placeholder="Reason (shown in audit log)" /><button className="btn">Apply</button></form>
