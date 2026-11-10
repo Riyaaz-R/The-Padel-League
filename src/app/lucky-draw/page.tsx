@@ -4,11 +4,13 @@ import { PageTitle } from '@/components/ui';
 import { LUCKY_DRAW } from '@/data/luckydraw';
 import { SEASON } from '@/data/seed';
 import { fmtDate, todaySAST } from '@/lib/format';
+import { loadWinners } from '@/data/winners';
 
 export const metadata: Metadata = { title: 'TPC Café Lucky Draw', description: 'Spend at TPC Padel Café during the league and win weekly prizes and the grand prize.' };
 export const dynamic = 'force-dynamic';
 
-export default function LuckyDraw() {
+export default async function LuckyDraw() {
+  const winners = await loadWinners();
   const today = todaySAST();
   const started = today >= SEASON.weeks[0].date;
   // current week = the latest league Friday that has arrived (week 1 until the competition starts)
@@ -42,6 +44,25 @@ export default function LuckyDraw() {
                 );
               })}
             </ol>
+          </div>
+
+          <div>
+            <h2 className="slashes mb-3 text-2xl">Winners</h2>
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {LUCKY_DRAW.prizes.map((p) => {
+                const w = winners.find((x) => x.week === p.week);
+                return (
+                  <li key={p.week} className={`card overflow-hidden !p-0 ${'grand' in p && p.grand ? 'sm:col-span-2' : ''}`}>
+                    {w?.photoUrl && <Image src={w.photoUrl} alt={`${w.name}, Week ${p.week} winner`} width={600} height={600} sizes="(max-width: 640px) 100vw, 20rem" className="h-56 w-full object-cover" />}
+                    <div className="p-4">
+                      <p className="text-xs uppercase tracking-widest text-bone/60">Week {p.week} · {p.prize}</p>
+                      {w ? (<><p className="display text-2xl text-lime">{w.name}</p>{w.caption && <p className="text-sm text-bone/70">{w.caption}</p>}</>)
+                        : <p className="text-bone/60">To be announced</p>}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
 
           <div className="card overflow-x-auto">
