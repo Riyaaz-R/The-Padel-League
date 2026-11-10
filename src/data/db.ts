@@ -4,6 +4,8 @@ import { cookies } from 'next/headers';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { createServerClient } from '@supabase/ssr';
 import type { PairingResult, SetScore, TbScore } from '@/domain/types';
+import { TEAMS } from './seed';
+import { SLOT_ORDER } from '@/domain/knockout';
 import { emptyPairings, type AppState, type FixtureState, type FixtureStatus, type PlayerRow } from './store';
 import type { Slot } from '@/domain/knockout';
 
@@ -89,6 +91,10 @@ export async function loadStateFresh(): Promise<AppState> {
       status: f.status as FixtureStatus, pairings, decidingWinner: f.deciding_winner ?? undefined, version: f.version, correctedAt: f.corrected_at ?? undefined,
     };
   });
+
+  // stable display order: week, group stage before knockouts, then the poster order of the home team
+  const teamIdx = (id: string) => TEAMS.findIndex((t) => t.id === id);
+  fx.sort((a, b) => a.week - b.week || Number(a.round !== 'group') - Number(b.round !== 'group') || (a.slot ? SLOT_ORDER.indexOf(a.slot) : 0) - (b.slot ? SLOT_ORDER.indexOf(b.slot) : 0) || (a.group ?? '').localeCompare(b.group ?? '') || teamIdx(a.home) - teamIdx(b.home));
 
   const settings = (season.data.settings ?? {}) as { tvScene?: string };
   const a = ann.data?.[0];
