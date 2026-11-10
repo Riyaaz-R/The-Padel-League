@@ -4,14 +4,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
-const SEEN_KEY = 'tpc-lucky-draw-welcome-seen';
 const TV_FIRST_MS = 15_000; // TV screen: first showing shortly after it opens
 const TV_EVERY_MS = 60_000; // then once a minute
 const TV_SHOW_MS = 5_000; // for 5 seconds
 
 /**
  * TPC Café Lucky Draw advert.
- *  - Website (phones, laptops): shown ONCE when someone arrives, with a button to read the rules before carrying on. Not shown again that visit.
+ *  - Website (phones, laptops): shown EVERY time someone opens the site, with a button to read the rules before carrying on. Moving between pages does not reopen it.
  *  - TV screen (/tv): pops up for 5 seconds every minute, with no buttons.
  *  - Never shown in the staff area or on the Lucky Draw page itself.
  */
@@ -24,20 +23,14 @@ export function LuckyDrawPopup() {
 
 function WelcomeAdvert({ onLuckyDrawPage }: { onLuckyDrawPage: boolean }) {
   const [open, setOpen] = useState(false);
-  const handled = useRef(false); // once per page load even if browser storage is unavailable
+  const handled = useRef(false);
   const primary = useRef<HTMLAnchorElement>(null);
   const secondary = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (handled.current) return;
-    handled.current = true;
-    let seen = false;
-    try { seen = sessionStorage.getItem(SEEN_KEY) === '1'; } catch { /* storage blocked: fall back to once per load */ }
-    // someone who lands straight on the Lucky Draw page has already seen the details
-    const mark = () => { try { sessionStorage.setItem(SEEN_KEY, '1'); } catch { /* ignore */ } };
-    if (onLuckyDrawPage) { mark(); return; }
-    if (seen) return;
-    const t = setTimeout(() => { setOpen(true); mark(); }, 600);
+    if (onLuckyDrawPage) { handled.current = true; return; } // already on the rules page
+    if (handled.current) return; // already shown on this arrival; moving around the site does not reopen it
+    const t = setTimeout(() => { handled.current = true; setOpen(true); }, 600);
     return () => clearTimeout(t);
   }, [onLuckyDrawPage]);
 
