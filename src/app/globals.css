@@ -33,3 +33,23 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .tv-drift { animation: drift 120s ease-in-out infinite; }
 
 @media print { body { background: #fff; color: #000; } .no-print { display: none !important; } .card { border-color: #999; background: #fff; } }
+
+/* Sliding announcement banner */
+.marquee { overflow: hidden; white-space: nowrap; }
+.marquee-track { display: inline-flex; animation: marquee var(--dur, 20s) linear infinite; will-change: transform; }
+.marquee:hover .marquee-track { animation-play-state: paused; }
+.marquee-static { display: none; }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .marquee { white-space: normal; text-align: center; }
+  .marquee-track { display: none; }
+  .marquee-static { display: block; padding: 0 1rem; }
+}
+
+/* Lucky Draw popup */
+.popup-in { animation: popup-in 250ms ease-out; }
+@keyframes popup-in { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
+.popup-bar { width: 100%; transform-origin: left; animation: popup-bar 5s linear forwards; }
+.popup-bar-paused { animation-play-state: paused; }
+@keyframes popup-bar { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+@media (prefers-reduced-motion: reduce) { .popup-in, .popup-bar { animation: none; } }

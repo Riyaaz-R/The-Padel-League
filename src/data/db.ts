@@ -49,6 +49,15 @@ export function resultToRow(pairingId: string, r: PairingResult, points: { home:
   };
 }
 
+/** The published announcement banner text, if any (cheap single query used on every page). */
+export async function getBanner(): Promise<string | undefined> {
+  try {
+    const { data } = await anonClient().from('announcements').select('body, expires_at').order('created_at', { ascending: false }).limit(1);
+    const a = data?.[0];
+    return a && (!a.expires_at || new Date(a.expires_at) > new Date()) ? a.body : undefined;
+  } catch { return undefined; }
+}
+
 /** Loads the active season for one request. Public data only (anon role). `loadState` is cached per request; use `loadStateFresh` after writes. */
 export const loadState = cache(() => loadStateFresh());
 export async function loadStateFresh(): Promise<AppState> {

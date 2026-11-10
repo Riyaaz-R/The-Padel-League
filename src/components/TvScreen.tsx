@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useSnapshot } from '@/lib/use-snapshot';
 import { FixtureLive, activeFixtures } from './LiveBoard';
+import { Marquee } from './Marquee';
 import type { Snapshot, SnapTableRow } from '@/lib/snapshot';
 
 const SCENES = ['live', 'standings', 'next', 'results', 'bracket'] as const;
@@ -71,7 +72,7 @@ export function TvScreen({ fixedScene, scale }: { fixedScene?: string; scale?: n
           {scene === 'results' && <div className="grid grid-cols-2 gap-[2vh]">{results.length ? results.map((f) => <FixtureLive key={f.id} f={f} big />) : <p className="text-[4vh]">No results yet.</p>}</div>}
           {scene === 'bracket' && <Bracket s={snap} />}
         </div>
-        {snap.announcement && <p className="mt-[1.5vh] rounded-xl bg-lime px-[2vh] py-[1vh] text-[2.6vh] font-bold text-ink">{snap.announcement}</p>}
+        {snap.announcement && <Marquee text={snap.announcement} className="mt-[1.5vh] rounded-xl bg-lime py-[1vh] text-[3vh] font-bold uppercase tracking-wide text-ink" />}
       </div>
     </div>
   );

@@ -3,6 +3,9 @@ import { Barlow_Condensed, Inter } from 'next/font/google';
 import Image from 'next/image';
 import Link from 'next/link';
 import './globals.css';
+import { AnnouncementBar } from '@/components/AnnouncementBar';
+import { LuckyDrawPopup } from '@/components/LuckyDrawPopup';
+import { getBanner } from '@/data/db';
 
 const display = Barlow_Condensed({ subsets: ['latin'], weight: ['700', '800'], style: ['italic'], variable: '--font-display' });
 const body = Inter({ subsets: ['latin'], variable: '--font-body' });
@@ -17,14 +20,18 @@ export const viewport: Viewport = { themeColor: '#07090b', width: 'device-width'
 
 const NAV = [
   ['/fixtures', 'Fixtures'], ['/tables', 'Tables'], ['/knockouts', 'Knockouts'], ['/teams', 'Teams'],
-  ['/players', 'Players'], ['/live', 'Live'], ['/rules', 'Rules'], ['/about', 'About'],
+  ['/players', 'Players'], ['/live', 'Live'], ['/lucky-draw', 'Lucky Draw'], ['/rules', 'Rules'], ['/about', 'About'],
 ] as const;
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export const dynamic = 'force-dynamic'; // the announcement banner is read per request
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const banner = await getBanner();
   return (
     <html lang="en-ZA" className={`${display.variable} ${body.variable}`}>
       <body>
         <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-lime focus:p-2 focus:text-ink">Skip to content</a>
+        <AnnouncementBar initial={banner} />
         <header className="no-print sticky top-0 z-40 border-b border-line bg-ink/90 backdrop-blur">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-5 gap-y-1 px-4 py-2">
             <Link href="/" className="flex items-center gap-2" aria-label="The Padel League home">
@@ -48,6 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </p>
           </div>
         </footer>
+        <LuckyDrawPopup />
       </body>
     </html>
   );
