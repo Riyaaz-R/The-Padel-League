@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+html { background: #07090b; }
+body {
+  @apply bg-ink text-bone font-sans antialiased;
+  background-image: radial-gradient(1200px 500px at 85% -10%, rgba(198, 240, 0, 0.07), transparent 60%);
+  min-height: 100vh;
+}
+h1, h2, h3, .display { @apply font-display italic uppercase tracking-wide; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #C6F000; outline-offset: 2px; }
+
+@layer components {
+  .card { @apply rounded-2xl border border-line bg-card p-4; }
+  .card-lime { @apply rounded-2xl border border-lime/40 bg-card p-4; }
+  .btn { @apply inline-flex min-h-[44px] items-center justify-center rounded-xl bg-lime px-5 font-bold uppercase tracking-wide text-ink hover:brightness-110 disabled:opacity-50; }
+  .btn-ghost { @apply inline-flex min-h-[44px] items-center justify-center rounded-xl border border-line px-4 font-semibold hover:border-lime; }
+  .input { @apply min-h-[44px] w-full rounded-lg border border-line bg-ink px-3 text-bone; }
+  .slashes::before { content: '///'; @apply mr-2 text-lime; }
+  .tag { @apply inline-flex items-center rounded-md px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-ink; }
+  .live-dot { animation: pulse 1.4s ease-in-out infinite; }
+}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) { .live-dot { animation: none; } * { scroll-behavior: auto !important; } }
+
+/* TV mode: everything scales with the viewport, no scrolling */
+.tv-root { position: fixed; inset: 0; z-index: 100; background: #07090b; font-size: 1.6vh; overflow: hidden; padding: 5vh 5vw; }
+.tv-root .tag { font-size: 1.7vh; }
+.tv-root .card-lime { padding: 2vh; border-radius: 2vh; }
+@keyframes drift { 0% { transform: translate(0, 0); } 50% { transform: translate(6px, 4px); } 100% { transform: translate(0, 0); } }
+.tv-drift { animation: drift 120s ease-in-out infinite; }
+
+@media print { body { background: #fff; color: #000; } .no-print { display: none !important; } .card { border-color: #999; background: #fff; } }
