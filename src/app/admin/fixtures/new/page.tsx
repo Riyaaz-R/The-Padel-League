@@ -13,7 +13,7 @@ export default async function NewFixture({ searchParams }: { searchParams: Promi
   const s = await loadState();
   return (
     <div className="max-w-3xl space-y-4">
-      <Link href="/admin" className="text-sm text-bone/70 hover:text-lime">← All fixtures</Link>
+      <Link href="/admin/fixtures" className="text-sm text-bone/70 hover:text-lime">← All fixtures</Link>
       <h1 className="text-3xl">Add a fixture</h1>
       <p className="text-sm text-bone/70">No score is needed. The fixture starts as <strong>Scheduled</strong>: add its players, go live when it starts, and complete it with the result afterwards.</p>
       {error && <p role="alert" className="card border-red-400 text-red-200">{error}</p>}

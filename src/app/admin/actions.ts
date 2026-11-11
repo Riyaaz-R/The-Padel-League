@@ -103,7 +103,7 @@ export async function quickStatus(fd: FormData) {
   const { db, staff } = await requireStaffAction('committee');
   const id = str(fd, 'id'); const status = str(fd, 'status') as FixtureStatus;
   // go back to the screen the button was pressed on (only known staff pages are allowed)
-  const ret = ['/admin', '/admin/live'].includes(str(fd, 'return')) ? str(fd, 'return') : '/admin';
+  const ret = ['/admin', '/admin/live', '/admin/fixtures'].includes(str(fd, 'return')) ? str(fd, 'return') : '/admin/fixtures';
   const to = (kind: 'ok' | 'error', msg: string): never => redirect(`${ret}?${kind}=${encodeURIComponent(msg)}`);
   if (status !== 'live' && status !== 'scheduled') return to('error', 'Use the fixture page to complete a match');
   const s = await loadStateFresh(); const f = s.fixtures.find((x) => x.id === id);

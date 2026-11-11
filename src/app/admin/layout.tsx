@@ -14,7 +14,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div>
       <nav aria-label="Admin" className="mb-6 flex flex-wrap items-center gap-3 rounded-xl border border-line bg-card px-3 py-2">
-        {isCommittee(staff) && <Link href="/admin" className="font-bold text-lime">Admin</Link>}
+        {isCommittee(staff) && <Link href="/admin" className="font-bold text-lime">Dashboard</Link>}
+        {isCommittee(staff) && <Link href="/admin/fixtures" className="font-semibold hover:text-lime">Fixtures</Link>}
         <Link href="/admin/live" className="hover:text-lime">Live scoring</Link>
         {isCommittee(staff) && <Link href="/admin/people" className="hover:text-lime">Players &amp; Teams</Link>}
         {isCommittee(staff) && <Link href="/admin/sponsors" className="hover:text-lime">Manage Sponsors</Link>}

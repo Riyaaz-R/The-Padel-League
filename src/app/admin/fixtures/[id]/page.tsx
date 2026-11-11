@@ -140,7 +140,7 @@ export default async function AdminFixture({ params, searchParams }: { params: P
   const allResults = SLOTS.every((sl) => f.pairings[sl].result);
   return (
     <div className="space-y-5">
-      <Link href="/admin" className="text-sm text-bone/70 hover:text-lime">← All fixtures</Link>
+      <Link href="/admin/fixtures" className="text-sm text-bone/70 hover:text-lime">← All fixtures</Link>
       <div className="flex flex-wrap items-center gap-3"><h1 className="text-3xl">{team(f.home).name} v {team(f.away).name}</h1><StatusTag status={f.status} />
         <span className="display text-2xl text-lime">{f.status === 'scheduled' ? 'vs' : `${out.homePts}–${out.awayPts}`}</span></div>
       <p className="text-sm text-bone/70">{roundLabel[f.round]}{f.group ? ` · Group ${f.group}` : ''} · Week {f.week}</p>

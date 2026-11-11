@@ -1,11 +1,8 @@
 import Link from 'next/link';
-import { StatusTag, team } from '@/components/ui';
 import { groupTables } from '@/data/derive';
-import { SEASON } from '@/data/seed';
 import { loadState } from '@/data/db';
 import { requireStaffPage } from '@/lib/auth';
-import { fmtDate, roundLabel } from '@/lib/format';
-import { addAnnouncement, addPenalty, quickStatus, setTvScene } from './actions';
+import { addAnnouncement, addPenalty, setTvScene } from './actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,41 +13,28 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
   const { data: audit } = await db.from('audit_log').select('at, action, after, reason').order('id', { ascending: false }).limit(50);
   const t = groupTables(s);
   const flagged = (['A', 'B'] as const).filter((g) => t[g].committeeRequired);
+  const live = s.fixtures.filter((f) => f.status === 'live').length;
+  const tiles: [string, string, string][] = [
+    ['/admin/fixtures', 'Fixtures', live > 0 ? `${live} live now` : `${s.fixtures.length} fixtures`],
+    ['/admin/live', 'Live scoring', 'Update live game scores'],
+    ['/admin/people', 'Players & Teams', `${s.players.length} players · ${s.teams.length} teams`],
+    ['/admin/sponsors', 'Manage Sponsors', 'Sponsors page and tiers'],
+    ['/admin/banner', 'Sponsor Banner', 'The sliding bottom banner'],
+    ['/admin/lucky-draw', 'Lucky Draw winners', 'Weekly winners and photos'],
+  ];
   return (
     <div className="space-y-8">
+      <h1 className="text-3xl">Staff dashboard</h1>
       {ok && <p role="status" className="card border-lime text-lime">{ok}</p>}
       {error && <p role="alert" className="card border-red-400 text-red-200">{error}</p>}
       {flagged.length > 0 && <p className="card border-amber-400 text-amber-200">Committee decision required to separate tied teams in Group {flagged.join(' and ')}. (Manual ordering UI arrives with the committee module.)</p>}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-3xl">Fixtures</h1>
-        <Link href="/admin/fixtures/new" className="btn">+ Add fixture</Link>
-      </div>
-      {SEASON.weeks.map((w) => {
-        const list = s.fixtures.filter((f) => f.week === w.week);
-        return (
-          <section key={w.week}><h2 className="slashes mb-2 text-2xl">Week {w.week} · {fmtDate(w.date)} · {w.label}</h2>
-            {list.length ? (
-              <ul className="grid gap-2 md:grid-cols-2">{list.map((f) => (
-                <li key={f.id} className={`card space-y-3 ${f.status === 'live' ? '!border-red-500' : ''}`}>
-                  <Link href={`/admin/fixtures/${f.id}`} className="flex items-center justify-between gap-2 hover:text-lime">
-                    <span><span className="font-semibold">{team(f.home).name} v {team(f.away).name}</span><br />
-                      <span className="text-xs text-bone/60">{roundLabel[f.round]}{f.group ? ` · Group ${f.group}` : ''}{f.date !== w.date ? ` · ${fmtDate(f.date)}` : ''}{f.time ? ` · ${f.time}` : ''}{f.court ? ` · Court ${f.court}` : ''}</span></span>
-                    <StatusTag status={f.status} />
-                  </Link>
-                  <div className="flex flex-wrap gap-2">
-                    {f.status === 'scheduled' && (
-                      <form action={quickStatus}><input type="hidden" name="id" value={f.id} /><input type="hidden" name="status" value="live" /><button className="btn !min-h-[40px] text-sm">Go live</button></form>)}
-                    {f.status === 'live' && (<>
-                      <Link href={`/admin/fixtures/${f.id}`} className="btn !min-h-[40px] text-sm">Enter result</Link>
-                      <form action={quickStatus}><input type="hidden" name="id" value={f.id} /><input type="hidden" name="status" value="scheduled" /><button className="!min-h-[40px] rounded-xl border border-red-400 px-4 text-sm font-bold text-red-300 hover:bg-red-500/10">Stop live</button></form></>)}
-                    {f.status === 'final' && <Link href={`/admin/fixtures/${f.id}`} className="btn-ghost !min-h-[40px] text-sm">View / correct result</Link>}
-                    <Link href={`/admin/fixtures/${f.id}`} className="btn-ghost !min-h-[40px] text-sm">Edit</Link>
-                  </div>
-                </li>))}</ul>
-            ) : <p className="text-sm text-bone/60">Created automatically as the previous round is completed, or add one with “Add fixture”.</p>}
-          </section>
-        );
-      })}
+
+      <nav aria-label="Staff sections"><ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {tiles.map(([href, title, sub]) => (
+          <li key={href}><Link href={href} className={`card-lime block h-full hover:border-lime ${title === 'Fixtures' && live > 0 ? '!border-red-500' : ''}`}>
+            <span className="display text-2xl">{title}</span><span className="block text-sm text-bone/70">{sub}</span></Link></li>))}
+      </ul></nav>
+
       <div className="grid gap-6 md:grid-cols-3">
         <form action={addAnnouncement} className="card space-y-2"><h2 className="text-xl">Announcement banner</h2>
           <input name="text" maxLength={240} defaultValue={s.announcement} className="input" placeholder="Leave empty to clear" /><button className="btn">Publish</button></form>
