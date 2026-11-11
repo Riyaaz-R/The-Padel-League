@@ -13,7 +13,10 @@ League hub, live scores and TV mode for the TPC Friday Night Team Padel League (
 | Staff `/staff` → `/admin` | Supabase Auth email + password, mandatory TOTP, roles from `profiles`; score entry with validation (client and database), forfeit buttons, status lifecycle, corrections with reason, penalties, announcement banner, TV scene, audit log. Tested with a real Super Admin: sign-in + TOTP, score entry for all four pairings, double-booking refused, Final verification, corrections need a reason, quarter-finals auto-created, live scoring (see docs/STAFF.md). Not yet tested: forfeit buttons, deciding set, penalties, announcement, TV scene, scorer role |
 | Database | Live on Supabase project `roqrejjlplrzwavvvmup` (eu-central-1, free). Schema, RLS, Season 1 seed. The whole site now reads from it. Database rules and anonymous-access limits tested |
 | Realtime | Live page and TV subscribe to Supabase Realtime with polling fallback. Verified: live score changes reach an open /live page without refresh |
-| Not built yet | Captain portal and pairing submission, score confirmation/dispute workflow, second-approver rule, offline queue, discipline UI, auction (Phase 5), share images, calendar, ledger, Vercel deploy |
+| Players & Teams (`/admin/people`) | Search/filter players, edit first name, surname, corrected name, level, team, status, price, suspension, consent flags, contact details and photo; add players; delete (refused if the player is in any pairing, set them to Withdrawn instead); move between teams (they are taken out of scheduled/live pairings, completed fixtures keep their history). Teams: name, short name, colour, group, logo, roster, add team. Fixtures and pairings reference players and teams by id, so renames never break them |
+| Fixture lifecycle | Scheduled → Live → Completed (stored as `final`). Saving never needs a score. Go live / Enter result / Edit buttons on the staff list, Add fixture form, confirmations when changing a Completed result. Only Completed fixtures count towards tables, results and the bracket |
+| Prize | One constant: `SEASON.prizePot` in `src/data/seed.ts`, formatted R20,000 by `fmtRand` |
+| Not built yet | Captain portal and pairing submission, score confirmation/dispute workflow, second-approver rule, offline queue, discipline UI, auction (Phase 5), share images, calendar, ledger |
 
 ## Run it
 

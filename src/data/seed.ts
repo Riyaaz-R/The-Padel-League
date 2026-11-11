@@ -6,7 +6,9 @@ export interface FixtureSeed { id: string; week: number; round: 'group'; group: 
 
 export const SEASON = {
   name: 'Season 1', number: 1, venue: 'TPC – The Padel Centre', tz: 'Africa/Johannesburg',
-  entryFee: 8000, ownershipFee: 10000, finalPrize: 20000,
+  entryFee: 8000, ownershipFee: 10000,
+  /** The league prize pot. Change it here and it updates everywhere. */
+  prizePot: 20000,
   weeks: [
     { week: 1, date: '2026-11-13', label: 'Group round 1' }, { week: 2, date: '2026-11-20', label: 'Group round 2' },
     { week: 3, date: '2026-11-27', label: 'Group round 3' }, { week: 4, date: '2026-12-04', label: 'Quarter-finals' },

@@ -1,7 +1,7 @@
 import { computeTable, fixtureTotals, type Table } from '@/domain/standings';
 import { SLOT_ROUND, fixtureOutcome, resolveBracket, type ResolvedSlot, type Slot } from '@/domain/knockout';
 import type { FixtureRecord } from '@/domain/types';
-import { TEAMS, SEASON } from './seed';
+import { SEASON } from './seed';
 import { SLOTS, type AppState, type FixtureState } from './store';
 
 export const toRecord = (f: FixtureState): FixtureRecord => ({
@@ -12,7 +12,7 @@ export const toRecord = (f: FixtureState): FixtureRecord => ({
 export function groupTables(s: AppState): { A: Table; B: Table } {
   const out = {} as { A: Table; B: Table };
   for (const g of ['A', 'B'] as const) {
-    const ids = TEAMS.filter((t) => t.group === g).map((t) => t.id);
+    const ids = s.teams.filter((t) => t.group === g).map((t) => t.id);
     const fx = s.fixtures.filter((f) => f.round === 'group' && f.group === g && f.status === 'final').map(toRecord);
     out[g] = computeTable(ids, fx, s.penalties, s.manualOrder[g]);
   }

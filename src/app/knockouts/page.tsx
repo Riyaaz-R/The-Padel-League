@@ -62,7 +62,7 @@ export default async function Knockouts() {
   );
   return (
     <div className="space-y-8">
-      <PageTitle sub={`All 8 teams qualify. Group positions set the seeding. The Final winner takes ${fmtRand(SEASON.finalPrize)}.`}>Knockouts</PageTitle>
+      <PageTitle sub={`All 8 teams qualify. Group positions set the seeding. Prize pot: ${fmtRand(SEASON.prizePot)}.`}>Knockouts</PageTitle>
       <section aria-label="Main bracket">{cols(COLS)}</section>
       <section aria-label="Plate bracket"><h2 className="slashes mb-2 text-3xl">Plate</h2>{cols(PLATE)}</section>
     </div>

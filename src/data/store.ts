@@ -11,10 +11,11 @@ export interface FixtureState {
   status: FixtureStatus; pairings: Record<PairingSlot, PairingState>; decidingWinner?: Side; version: number;
   correctedAt?: string;
 }
-export interface PlayerRow { id: string; name: string; teamId: string; division: Division }
+export interface TeamRow { id: string; uuid: string; name: string; short: string; logo: string; colour?: string; group?: 'A' | 'B' }
+export interface PlayerRow { id: string; name: string; teamId: string; division: Division; photoUrl?: string }
 export interface AppState {
   seasonId: string;
-  fixtures: FixtureState[]; players: PlayerRow[]; penalties: Penalty[]; manualOrder: { A?: string[]; B?: string[] };
+  fixtures: FixtureState[]; players: PlayerRow[]; teams: TeamRow[]; penalties: Penalty[]; manualOrder: { A?: string[]; B?: string[] };
   announcement?: string; tvScene?: string;
   /** team slug <-> uuid maps for writes */
   teamUuid: Record<string, string>; groupUuid: Record<string, string>;

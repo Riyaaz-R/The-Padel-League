@@ -5,8 +5,10 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { createServerClient } from '@supabase/ssr';
 import type { PairingResult, SetScore, TbScore } from '@/domain/types';
 import { TEAMS } from './seed';
+import { registerTeams } from './team-store';
+import { resolveLogo, storageUrl } from '@/lib/media';
 import { SLOT_ORDER } from '@/domain/knockout';
-import { emptyPairings, type AppState, type FixtureState, type FixtureStatus, type PlayerRow } from './store';
+import { emptyPairings, type AppState, type FixtureState, type FixtureStatus, type PlayerRow, type TeamRow } from './store';
 import type { Slot } from '@/domain/knockout';
 
 const URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
@@ -66,10 +68,10 @@ export async function loadStateFresh(): Promise<AppState> {
   if (season.error) throw new Error(`Could not load season: ${season.error.message}`);
   const sid = season.data.id as string;
   const [teams, groups, fixtures, players, sanctions, ann] = await Promise.all([
-    db.from('teams').select('id, slug').eq('season_id', sid),
+    db.from('teams').select('id, slug, name, short, logo_path, colour, group_id').eq('season_id', sid),
     db.from('groups').select('id, name').eq('season_id', sid),
     db.from('fixtures').select('*, pairings(*, pairing_results(*), live_pairing_state(*))').eq('season_id', sid).order('week').order('created_at'),
-    db.from('public_players').select('id, team_id, division, display_name').eq('season_id', sid),
+    db.from('public_players').select('id, team_id, division, display_name, photo_path').eq('season_id', sid),
     db.from('sanctions').select('team_id, points, reason').eq('season_id', sid).eq('kind', 'point_penalty'),
     db.from('announcements').select('body, expires_at').eq('season_id', sid).order('created_at', { ascending: false }).limit(1),
   ]);
@@ -80,7 +82,11 @@ export async function loadStateFresh(): Promise<AppState> {
   const groupName = new Map((groups.data ?? []).map((g) => [g.id as string, g.name as 'A' | 'B']));
   const groupUuid = Object.fromEntries((groups.data ?? []).map((g) => [g.name as string, g.id as string]));
 
-  const playerRows: PlayerRow[] = (players.data ?? []).map((p) => ({ id: p.id, name: p.display_name, teamId: slugOf.get(p.team_id) ?? '', division: p.division }));
+  const playerRows: PlayerRow[] = (players.data ?? []).map((p) => ({ id: p.id, name: p.display_name, teamId: slugOf.get(p.team_id) ?? '', division: p.division, ...(p.photo_path ? { photoUrl: storageUrl('player-photos', p.photo_path) } : {}) }));
+  const seedIdx = (slug: string) => { const i = TEAMS.findIndex((t) => t.id === slug); return i < 0 ? 999 : i; };
+  const teamRows: TeamRow[] = (teams.data ?? []).map((t) => ({ id: t.slug, uuid: t.id, name: t.name, short: t.short, logo: resolveLogo(t.logo_path), colour: t.colour ?? undefined, group: t.group_id ? groupName.get(t.group_id) : undefined }))
+    .sort((a, b) => (a.group ?? 'Z').localeCompare(b.group ?? 'Z') || seedIdx(a.id) - seedIdx(b.id) || a.name.localeCompare(b.name));
+  registerTeams(teamRows);
 
   const fx: FixtureState[] = (fixtures.data ?? []).map((f) => {
     const pairings = emptyPairings();
@@ -102,13 +108,13 @@ export async function loadStateFresh(): Promise<AppState> {
   });
 
   // stable display order: week, group stage before knockouts, then the poster order of the home team
-  const teamIdx = (id: string) => TEAMS.findIndex((t) => t.id === id);
+  const teamIdx = (id: string) => teamRows.findIndex((t) => t.id === id);
   fx.sort((a, b) => a.week - b.week || Number(a.round !== 'group') - Number(b.round !== 'group') || (a.slot ? SLOT_ORDER.indexOf(a.slot) : 0) - (b.slot ? SLOT_ORDER.indexOf(b.slot) : 0) || (a.group ?? '').localeCompare(b.group ?? '') || teamIdx(a.home) - teamIdx(b.home));
 
   const settings = (season.data.settings ?? {}) as { tvScene?: string };
   const a = ann.data?.[0];
   return {
-    seasonId: sid, fixtures: fx, players: playerRows, manualOrder: {}, teamUuid, groupUuid, tvScene: settings.tvScene,
+    seasonId: sid, fixtures: fx, players: playerRows, teams: teamRows, manualOrder: {}, teamUuid, groupUuid, tvScene: settings.tvScene,
     penalties: (sanctions.data ?? []).map((s) => ({ teamId: slugOf.get(s.team_id) ?? '', points: s.points ?? 0, reason: s.reason })),
     announcement: a && (!a.expires_at || new Date(a.expires_at) > new Date()) ? a.body : undefined,
   };

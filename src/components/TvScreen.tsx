@@ -47,6 +47,7 @@ export function TvScreen({ fixedScene, scale }: { fixedScene?: string; scale?: n
   const router = useRouter();
   const { snap, online } = useSnapshot(3000);
   const [i, setI] = useState(0);
+  const [page, setPage] = useState(0); // pages of 4 matches when more are on court at once
   const [controls, setControls] = useState(true);
   const [isFs, setIsFs] = useState(false);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -62,6 +63,8 @@ export function TvScreen({ fixedScene, scale }: { fixedScene?: string; scale?: n
     if (document.fullscreenElement) void document.exitFullscreen().catch(() => {});
     else void document.documentElement.requestFullscreen?.().catch(() => {});
   }, []);
+
+  useEffect(() => { const t = setInterval(() => setPage((p) => p + 1), 12000); return () => clearInterval(t); }, []);
 
   useEffect(() => {
     if (!rotating) return;
@@ -106,6 +109,9 @@ export function TvScreen({ fixedScene, scale }: { fixedScene?: string; scale?: n
   if (!snap) return <div className="tv-root flex items-center justify-center text-[4vh]">Loading…{controlBar}</div>;
   const scene: Scene = rotating ? SCENES[i] : SCENES.includes(mode as Scene) ? (mode as Scene) : 'live';
   const list = activeFixtures(snap);
+  const pages = Math.max(1, Math.ceil(list.length / 4));
+  const pageNo = page % pages;
+  const shown = list.slice(pageNo * 4, pageNo * 4 + 4);
   const results = snap.fixtures.filter((f) => f.status === 'final').slice(-6).reverse();
   const next = snap.fixtures.filter((f) => f.status === 'scheduled').slice(0, 4);
 
@@ -117,10 +123,10 @@ export function TvScreen({ fixedScene, scale }: { fixedScene?: string; scale?: n
           <div className="flex items-center gap-[2vh]"><Image src="/logos/league-badge.webp" alt="" width={90} height={90} className="h-[6vh] w-[6vh] rounded-full" />
             <h1 className="text-[4vh]">The Padel <span className="text-lime">League</span></h1></div>
           <div className="text-right text-[2.2vh] text-bone/70"><p>TPC Friday Night League · Powered by PadelBros</p>
-            <p className={online ? 'text-lime' : 'text-amber-300'}>{online ? '● LIVE SCORES' : '● reconnecting… showing last known scores'}</p></div>
+            <p className={online ? 'text-lime' : 'text-amber-300'}>{online ? '● LIVE SCORES' : '● reconnecting… showing last known scores'}{scene === 'live' && pages > 1 ? `  ·  page ${pageNo + 1} of ${pages}` : ''}</p></div>
         </header>
         <div className="min-h-0 flex-1 overflow-hidden">
-          {scene === 'live' && <div className={`grid h-full gap-[1vh] ${list.length > 2 ? 'grid-cols-2' : 'grid-cols-1'} content-start`}>{list.slice(0, 4).map((f) => <FixtureLive key={f.id} f={f} big />)}</div>}
+          {scene === 'live' && <div className={`grid h-full gap-[1vh] ${shown.length > 2 ? 'grid-cols-2' : 'grid-cols-1'} content-start`}>{shown.map((f) => <FixtureLive key={f.id} f={f} big />)}</div>}
           {scene === 'standings' && <Standings s={snap} />}
           {scene === 'next' && <div className="grid grid-cols-2 gap-[2vh]">{next.length ? next.map((f) => <FixtureLive key={f.id} f={f} big />) : <p className="text-[4vh]">All fixtures this round are complete.</p>}</div>}
           {scene === 'results' && <div className="grid grid-cols-2 gap-[2vh]">{results.length ? results.map((f) => <FixtureLive key={f.id} f={f} big />) : <p className="text-[4vh]">No results yet.</p>}</div>}

@@ -1,3 +1,6 @@
+import { SEASON } from './seed';
+import { fmtRand } from '@/lib/format';
+
 export const RULES_VERSION = { version: 1, effective: '13 Nov 2026' };
 
 /** From the official Rules & Regulations PDF (plus the league owner's confirmed clarifications, marked). */
@@ -9,9 +12,9 @@ export const RULES: { id: string; title: string; items: string[] }[] = [
     'Week 4: quarter-finals. Week 5: semi-finals. Week 6: Final, 3rd/4th place, Plate Final, Plate 3rd/4th.',
   ] },
   { id: 'registration', title: '2. Registration, captains & auction', items: [
-    'Entry fee: R8 000 per team (R600–R800 per player).',
-    'Team ownership: R10 000 per team (includes the team entry fee and captain selection).',
-    'Prize: R20 000 to the team that wins the Final.',
+    `Entry fee: ${fmtRand(SEASON.entryFee)} per team (R600–R800 per player).`,
+    `Team ownership: ${fmtRand(SEASON.ownershipFee)} per team (includes the team entry fee and captain selection).`,
+    `Prize pot: ${fmtRand(SEASON.prizePot)}.`,
     'Captains are selected through a random live draw. Teams are assembled by captains through a player auction.',
     'Only registered players assigned to their team may participate in the league.',
     'All teams must keep the required player-category composition; category eligibility is determined by the committee.',

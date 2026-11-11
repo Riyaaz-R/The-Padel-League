@@ -1,9 +1,8 @@
 import 'server-only';
 import { fixtureTotals, groupTables, toRecord } from '@/data/derive';
-import { TEAMS } from '@/data/seed';
 import { loadState } from '@/data/db';
 import { loadWinners } from '@/data/winners';
-import { SLOTS, type AppState, type FixtureState, type LiveState, type PlayerRow } from '@/data/store';
+import { SLOTS, type AppState, type FixtureState, type LiveState, type PlayerRow, type TeamRow } from '@/data/store';
 import { pairingPoints } from '@/domain/scoring';
 import { bracket } from '@/data/derive';
 import { todaySAST } from '@/lib/format';
@@ -25,12 +24,12 @@ export interface Snapshot {
 }
 
 const names = (players: PlayerRow[], ids: string[]) => ids.map((id) => players.find((p) => p.id === id)?.name ?? '').filter(Boolean).join(' & ') || 'TBC';
-const tm = (id: string) => { const t = TEAMS.find((x) => x.id === id)!; return { id, name: t.name, short: t.short, logo: t.logo }; };
+const tm = (teams: TeamRow[], id: string) => { const t = teams.find((x) => x.id === id); return { id, name: t?.name ?? id, short: t?.short ?? id.slice(0, 3).toUpperCase(), logo: t?.logo ?? '/logos/league-badge.webp' }; };
 
-function snapFixture(f: FixtureState, players: PlayerRow[]): SnapFixture {
+function snapFixture(f: FixtureState, players: PlayerRow[], teams: TeamRow[]): SnapFixture {
   const t = fixtureTotals(toRecord(f));
   return {
-    id: f.id, round: f.round, week: f.week, date: f.date, time: f.time, court: f.court, status: f.status, home: tm(f.home), away: tm(f.away),
+    id: f.id, round: f.round, week: f.week, date: f.date, time: f.time, court: f.court, status: f.status, home: tm(teams, f.home), away: tm(teams, f.away),
     homePts: t.homePts, awayPts: t.awayPts,
     pairings: SLOTS.map((slot) => {
       const p = f.pairings[slot];
@@ -44,12 +43,12 @@ export async function snapshot(): Promise<Snapshot> {
   const [s, winners]: [AppState, Awaited<ReturnType<typeof loadWinners>>] = await Promise.all([loadState(), loadWinners()]);
   const tables = groupTables(s);
   const row = (r: ReturnType<typeof groupTables>['A']['rows'][number]): SnapTableRow => ({
-    teamId: r.teamId, name: TEAMS.find((t) => t.id === r.teamId)!.name, logo: TEAMS.find((t) => t.id === r.teamId)!.logo, pos: r.pos,
+    teamId: r.teamId, name: tm(s.teams, r.teamId).name, logo: tm(s.teams, r.teamId).logo, pos: r.pos,
     played: r.played, setsDiff: r.setsW - r.setsL, gamesDiff: r.gamesW - r.gamesL, points: r.points - r.penalty, note: r.note,
   });
   return {
     now: new Date().toISOString(), today: todaySAST(), tvScene: s.tvScene, announcement: s.announcement, winners: winners.map((w) => ({ week: w.week, name: w.name })),
-    fixtures: s.fixtures.map((f) => snapFixture(f, s.players)), tables: { A: tables.A.rows.map(row), B: tables.B.rows.map(row) },
-    bracket: bracket(s), teams: Object.fromEntries(TEAMS.map((t) => [t.id, { name: t.name, logo: t.logo }])),
+    fixtures: s.fixtures.map((f) => snapFixture(f, s.players, s.teams)), tables: { A: tables.A.rows.map(row), B: tables.B.rows.map(row) },
+    bracket: bracket(s), teams: Object.fromEntries(s.teams.map((t) => [t.id, { name: t.name, logo: t.logo }])),
   };
 }

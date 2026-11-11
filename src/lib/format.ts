@@ -1,7 +1,8 @@
 const TZ = 'Africa/Johannesburg';
 export const fmtDate = (iso: string, opts: Intl.DateTimeFormatOptions = { weekday: 'short', day: 'numeric', month: 'short' }) =>
   new Intl.DateTimeFormat('en-ZA', { timeZone: TZ, ...opts }).format(new Date(iso.length === 10 ? iso + 'T12:00:00+02:00' : iso));
-export const fmtRand = (n: number) => 'R ' + new Intl.NumberFormat('en-ZA', { maximumFractionDigits: 0 }).format(n).replace(/ /g, ' ');
+/** Money as R20,000 (comma-grouped, no space) everywhere on the site. */
+export const fmtRand = (n: number) => 'R' + new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(n);
 /** SAST calendar date for "now" as YYYY-MM-DD. */
 export const todaySAST = () => new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(new Date());
 export const daysUntil = (iso: string) => Math.round((Date.parse(iso + 'T00:00:00Z') - Date.parse(todaySAST() + 'T00:00:00Z')) / 86400000);

@@ -1,10 +1,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Division } from '@/domain/types';
-import { TEAMS } from '@/data/seed';
+import { teamOf } from '@/data/team-store';
 import { divisionLabel } from '@/lib/format';
 
-export const team = (id: string) => TEAMS.find((t) => t.id === id)!;
+export const team = (id: string) => teamOf(id);
 
 /** Every logo sits in the same dark rounded tile so mixed backgrounds look uniform. */
 export function TeamBadge({ id, size = 48 }: { id: string; size?: number }) {
@@ -42,7 +42,7 @@ export function PageTitle({ children, sub }: { children: React.ReactNode; sub?: 
 export function StatusTag({ status }: { status: string }) {
   const map: Record<string, [string, string]> = {
     scheduled: ['Scheduled', 'bg-line text-bone'], live: ['Live', 'bg-red-500 text-white'],
-    awaiting_confirmation: ['Awaiting confirmation', 'bg-amber-400 text-ink'], final: ['Final', 'bg-lime text-ink'], disputed: ['Disputed', 'bg-red-700 text-white'],
+    awaiting_confirmation: ['Awaiting confirmation', 'bg-amber-400 text-ink'], final: ['Completed', 'bg-lime text-ink'], disputed: ['Disputed', 'bg-red-700 text-white'],
   };
   const [label, cls] = map[status] ?? [status, 'bg-line'];
   return <span className={`tag ${cls}`}>{status === 'live' && <span className="live-dot mr-1">●</span>}{label}</span>;

@@ -10,7 +10,7 @@ export default function About() {
     <div className="space-y-8">
       <PageTitle>About the league</PageTitle>
       <section className="card"><h2 className="text-2xl">Venue</h2><p>{SEASON.venue}. The league is run by PadelBros (Instagram @padelbros_sa). Court numbers and start times are published by the committee before each Friday.</p></section>
-      <section className="card"><h2 className="text-2xl">Money</h2><ul className="list-disc pl-5"><li>Team entry: {fmtRand(SEASON.entryFee)}</li><li>Team ownership: {fmtRand(SEASON.ownershipFee)} (includes entry fee and captain selection)</li><li>Prize: {fmtRand(SEASON.finalPrize)} to the team that wins the Final</li></ul></section>
+      <section className="card"><h2 className="text-2xl">Money</h2><ul className="list-disc pl-5"><li>Team entry: {fmtRand(SEASON.entryFee)}</li><li>Team ownership: {fmtRand(SEASON.ownershipFee)} (includes entry fee and captain selection)</li><li>Prize pot: {fmtRand(SEASON.prizePot)}</li></ul></section>
       <section className="card"><h2 className="text-2xl">Committee</h2>
         <p>Chairman: <strong>{COMMITTEE.chairman}</strong> · Treasurer: <strong>{COMMITTEE.treasurer}</strong></p>
         <p className="mt-1">Committee: {COMMITTEE.committee.join(', ')}</p><p>Members: {COMMITTEE.members.join(', ')}</p>

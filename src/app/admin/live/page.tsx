@@ -9,7 +9,8 @@ export default async function AdminLive({ searchParams }: { searchParams: Promis
   const { ok, error } = await searchParams;
   await requireStaffPage('scorer');
   const s = await loadState();
-  const active = s.fixtures.filter((f) => f.status === 'live' || f.status === 'scheduled').slice(0, 8);
+  // every LIVE match first (several can be on at once), then the next few Scheduled ones
+  const active = [...s.fixtures.filter((f) => f.status === 'live'), ...s.fixtures.filter((f) => f.status === 'scheduled').slice(0, 8)];
   return (
     <div className="space-y-4">
       <h1 className="text-3xl">Live scoring</h1>

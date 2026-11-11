@@ -46,8 +46,8 @@ export default async function Home() {
         <div className="card-lime"><p className="text-xs uppercase tracking-widest text-bone/60">Next Friday</p>
           <p className="display text-3xl">Week {nextWeek.week} of 6</p><p>{fmtDate(nextWeek.date, { weekday: 'long', day: 'numeric', month: 'long' })}</p>
           <p className="text-sm text-lime">{d > 0 ? `${d} day${d > 1 ? 's' : ''} to go` : d === 0 ? 'Tonight!' : ''}</p></div>
-        <div className="card-lime sm:col-span-2"><p className="text-xs uppercase tracking-widest text-bone/60">Prize</p>
-          <p className="display text-4xl text-lime">{fmtRand(SEASON.finalPrize)}</p><p>goes to the team that wins the Final.</p></div>
+        <div className="card-lime sm:col-span-2"><p className="text-xs uppercase tracking-widest text-bone/60">Prize pot</p>
+          <p className="display text-4xl text-lime">{fmtRand(SEASON.prizePot)}</p><p>prize pot</p></div>
       </section>
 
       <section>

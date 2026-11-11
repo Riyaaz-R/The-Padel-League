@@ -2,10 +2,10 @@
 import { useRef, useState } from 'react';
 
 /**
- * Photo field that shrinks a phone photo in the browser (max 1400px, JPEG) before upload, so it is small and quick
+ * Photo field that shrinks a phone photo in the browser (default max 1400px JPEG; PNG with transparency for logos) before upload, so it is small and quick
  * even on venue Wi-Fi. EXIF orientation is applied. The server re-processes it to WebP and strips metadata.
  */
-export function PhotoPicker({ name = 'photo', label = 'Winner photo (optional)' }: { name?: string; label?: string }) {
+export function PhotoPicker({ name = 'photo', label = 'Winner photo (optional)', maxSize = 1400, keepTransparency = false }: { name?: string; label?: string; maxSize?: number; keepTransparency?: boolean }) {
   const [preview, setPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
@@ -19,14 +19,15 @@ export function PhotoPicker({ name = 'photo', label = 'Winner photo (optional)' 
     setBusy(true);
     try {
       const bmp = await createImageBitmap(f, { imageOrientation: 'from-image' });
-      const scale = Math.min(1, 1400 / Math.max(bmp.width, bmp.height));
+      const scale = Math.min(1, maxSize / Math.max(bmp.width, bmp.height));
       const c = document.createElement('canvas');
       c.width = Math.round(bmp.width * scale); c.height = Math.round(bmp.height * scale);
       c.getContext('2d')!.drawImage(bmp, 0, 0, c.width, c.height);
-      const blob = await new Promise<Blob | null>((res) => c.toBlob(res, 'image/jpeg', 0.86));
+      const mime = keepTransparency ? 'image/png' : 'image/jpeg';
+      const blob = await new Promise<Blob | null>((res) => c.toBlob(res, mime, 0.86));
       if (!blob) throw new Error('encode');
       const dt = new DataTransfer();
-      dt.items.add(new File([blob], 'winner.jpg', { type: 'image/jpeg' }));
+      dt.items.add(new File([blob], keepTransparency ? 'upload.png' : 'upload.jpg', { type: mime }));
       if (input.current) input.current.files = dt.files;
       setPreview(URL.createObjectURL(blob));
     } catch { setErr('Could not read that photo. Try a different one.'); if (input.current) input.current.value = ''; }

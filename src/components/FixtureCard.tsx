@@ -16,12 +16,12 @@ export function FixtureCard({ f, link = true }: { f: FixtureState; link?: boolea
       </div>
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
         <div className="flex items-center gap-3"><TeamBadge id={f.home} size={44} /><span className="font-bold leading-tight">{team(f.home).name}</span></div>
-        <div className="display text-3xl tabular-nums" aria-label={started ? `${t.homePts} to ${t.awayPts}` : 'not started'}>
-          {started ? `${t.homePts} – ${t.awayPts}` : 'v'}
+        <div className="display text-3xl tabular-nums" aria-label={started || f.status === 'live' ? `${t.homePts} to ${t.awayPts}` : 'not started'}>
+          {started || f.status === 'live' ? `${t.homePts} – ${t.awayPts}` : 'vs'}
         </div>
         <div className="flex items-center justify-end gap-3 text-right"><span className="font-bold leading-tight">{team(f.away).name}</span><TeamBadge id={f.away} size={44} /></div>
       </div>
-      {f.status !== 'final' && started && <p className="mt-2 text-xs text-amber-300">Provisional – only verified results count towards the table.</p>}
+      {f.status !== 'final' && started && <p className="mt-2 text-xs text-amber-300">Only Completed matches count towards the table.</p>}
     </div>
   );
   return link ? <Link href={`/fixtures/${f.id}`} className="block">{body}</Link> : body;
