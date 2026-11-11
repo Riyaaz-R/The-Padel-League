@@ -42,7 +42,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
                       <form action={quickStatus}><input type="hidden" name="id" value={f.id} /><input type="hidden" name="status" value="live" /><button className="btn !min-h-[40px] text-sm">Go live</button></form>)}
                     {f.status === 'live' && (<>
                       <Link href={`/admin/fixtures/${f.id}`} className="btn !min-h-[40px] text-sm">Enter result</Link>
-                      <form action={quickStatus}><input type="hidden" name="id" value={f.id} /><input type="hidden" name="status" value="scheduled" /><button className="btn-ghost !min-h-[40px] text-sm">Back to Scheduled</button></form></>)}
+                      <form action={quickStatus}><input type="hidden" name="id" value={f.id} /><input type="hidden" name="status" value="scheduled" /><button className="!min-h-[40px] rounded-xl border border-red-400 px-4 text-sm font-bold text-red-300 hover:bg-red-500/10">Stop live</button></form></>)}
                     {f.status === 'final' && <Link href={`/admin/fixtures/${f.id}`} className="btn-ghost !min-h-[40px] text-sm">View / correct result</Link>}
                     <Link href={`/admin/fixtures/${f.id}`} className="btn-ghost !min-h-[40px] text-sm">Edit</Link>
                   </div>

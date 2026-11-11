@@ -92,7 +92,7 @@ function Lifecycle({ f, allResults }: { f: FixtureState; allResults: boolean }) 
             <p className="text-xs text-bone/60">{allResults ? 'All four pairings have a result. Completing the match counts it towards the table.' : 'Enter the result of every pairing below first. Then complete the match and it will count towards the table.'}</p></form>
           <div className="flex flex-wrap gap-2">
             <Link href="/admin/live" className="btn-ghost">Update live score</Link>
-            <form action={setStatus}><input type="hidden" name="id" value={f.id} /><input type="hidden" name="status" value="scheduled" /><button className="btn-ghost">Back to Scheduled</button></form>
+            <form action={setStatus}><input type="hidden" name="id" value={f.id} /><input type="hidden" name="status" value="scheduled" /><button className="rounded-xl border border-red-400 px-5 py-3 font-bold text-red-300 hover:bg-red-500/10">Stop live (back to Scheduled)</button></form>
           </div>
         </div>)}
       {f.status === 'final' && (

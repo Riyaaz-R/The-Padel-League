@@ -102,15 +102,19 @@ const STATUS_LABEL: Record<string, string> = { scheduled: 'Scheduled', live: 'Li
 export async function quickStatus(fd: FormData) {
   const { db, staff } = await requireStaffAction('committee');
   const id = str(fd, 'id'); const status = str(fd, 'status') as FixtureStatus;
-  if (status !== 'live' && status !== 'scheduled') return redirect('/admin?error=Use the fixture page to complete a match');
+  // go back to the screen the button was pressed on (only known staff pages are allowed)
+  const ret = ['/admin', '/admin/live'].includes(str(fd, 'return')) ? str(fd, 'return') : '/admin';
+  const to = (kind: 'ok' | 'error', msg: string): never => redirect(`${ret}?${kind}=${encodeURIComponent(msg)}`);
+  if (status !== 'live' && status !== 'scheduled') return to('error', 'Use the fixture page to complete a match');
   const s = await loadStateFresh(); const f = s.fixtures.find((x) => x.id === id);
-  if (!f) return redirect('/admin?error=That fixture no longer exists');
-  if (f.status === 'final') return redirect('/admin?error=That match is Completed. Open it to change the result.');
+  if (!f) return to('error', 'That fixture no longer exists');
+  if (f.status === 'final') return to('error', 'That match is Completed. Open it to change the result.');
+  if (f.status === status) return to('ok', status === 'live' ? 'That match is already LIVE' : 'That match is already Scheduled');
   const r = await db.from('fixtures').update({ status, version: f.version + 1 }).eq('id', id).eq('version', f.version).select('id');
-  if (r.error) return redirect(`/admin?error=${encodeURIComponent(r.error.message)}`);
-  if (!r.data?.length) return redirect('/admin?error=Someone else changed that fixture. Please try again.');
+  if (r.error) return to('error', r.error.message);
+  if (!r.data?.length) return to('error', 'Someone else changed that fixture. Please try again.');
   await audit(db, staff, 'fixture.status', `${f.status} -> ${status}`, undefined, id);
-  refresh(); redirect(`/admin?ok=${encodeURIComponent(status === 'live' ? 'Match is now LIVE' : 'Match moved back to Scheduled')}`);
+  refresh(); to('ok', status === 'live' ? 'Match is now LIVE' : 'Live stopped. The match is back to Scheduled and is hidden from the live screens.');
 }
 
 export async function setStatus(fd: FormData) {
@@ -129,7 +133,7 @@ export async function setStatus(fd: FormData) {
   if (!r.data?.length) return back(id, 'Someone else changed this fixture. Reload and try again.');
   await audit(db, staff, 'fixture.status', `${STATUS_LABEL[f.status] ?? f.status} -> ${STATUS_LABEL[status]}`, reason || undefined, id);
   await syncKnockouts(db, await loadStateFresh());
-  refresh(); back(id, status === 'final' ? 'Completed. This result now counts towards the table.' : status === 'live' ? 'Match is now LIVE.' : 'Moved back to Scheduled.', 'ok');
+  refresh(); back(id, status === 'final' ? 'Completed. This result now counts towards the table.' : status === 'live' ? 'Match is now LIVE.' : 'Live stopped. The match is back to Scheduled and is hidden from the live screens.', 'ok');
 }
 
 // ---------------- pairings and scores ----------------

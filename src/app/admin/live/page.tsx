@@ -1,13 +1,14 @@
 import { team } from '@/components/ui';
 import { SLOTS } from '@/data/store';
 import { loadState } from '@/data/db';
-import { requireStaffPage } from '@/lib/auth';
+import { isCommittee, requireStaffPage } from '@/lib/auth';
 import { slotLabel } from '@/lib/format';
-import { saveLive } from '../actions';
+import { quickStatus, saveLive } from '../actions';
 
 export default async function AdminLive({ searchParams }: { searchParams: Promise<{ ok?: string; error?: string }> }) {
   const { ok, error } = await searchParams;
-  await requireStaffPage('scorer');
+  const { staff } = await requireStaffPage('scorer');
+  const committee = isCommittee(staff);
   const s = await loadState();
   // every LIVE match first (several can be on at once), then the next few Scheduled ones
   const active = [...s.fixtures.filter((f) => f.status === 'live'), ...s.fixtures.filter((f) => f.status === 'scheduled').slice(0, 8)];
@@ -16,9 +17,12 @@ export default async function AdminLive({ searchParams }: { searchParams: Promis
       <h1 className="text-3xl">Live scoring</h1>
       <p className="text-sm text-bone/70">Update the current game score for a pairing; the TV and public pages refresh within seconds. Enter the final set scores on the fixture page when the match ends.</p>
       {error && <p role="alert" className="card border-red-400 text-red-200">{error}</p>}
-      {ok && <p role="status" className="card border-lime text-lime">Live score updated</p>}
+      {ok && <p role="status" className="card border-lime text-lime">{ok === '1' ? 'Live score updated' : ok}</p>}
       {active.map((f) => (
-        <section key={f.id} className="card space-y-2"><h2 className="text-xl">{team(f.home).name} v {team(f.away).name}</h2>
+        <section key={f.id} className={`card space-y-2 ${f.status === 'live' ? '!border-red-500' : ''}`}>
+          <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="text-xl">{f.status === 'live' && <span className="mr-2 text-sm text-red-400">● LIVE</span>}{team(f.home).name} v {team(f.away).name}</h2>
+            {committee && <form action={quickStatus}><input type="hidden" name="id" value={f.id} /><input type="hidden" name="return" value="/admin/live" /><input type="hidden" name="status" value={f.status === 'live' ? 'scheduled' : 'live'} />
+              {f.status === 'live' ? <button className="rounded-xl border border-red-400 px-4 py-2 text-sm font-bold text-red-300 hover:bg-red-500/10">Stop live</button> : <button className="btn !min-h-[40px] text-sm">Go live</button>}</form>}</div>
           {SLOTS.filter((sl) => !f.pairings[sl].result).map((sl) => { const l = f.pairings[sl].live; return (
             <form key={sl} action={saveLive} className="flex flex-wrap items-center gap-2 border-t border-line pt-2">
               <input type="hidden" name="id" value={f.id} /><input type="hidden" name="slot" value={sl} />
