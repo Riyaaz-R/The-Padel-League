@@ -17,6 +17,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         {isCommittee(staff) && <Link href="/admin" className="font-bold text-lime">Admin</Link>}
         <Link href="/admin/live" className="hover:text-lime">Live scoring</Link>
         {isCommittee(staff) && <Link href="/admin/people" className="hover:text-lime">Players &amp; Teams</Link>}
+        {isCommittee(staff) && <Link href="/admin/sponsors" className="hover:text-lime">Manage Sponsors</Link>}
+        {isCommittee(staff) && <Link href="/admin/banner" className="hover:text-lime">Sponsor Banner</Link>}
         {isCommittee(staff) && <Link href="/admin/lucky-draw" className="hover:text-lime">Lucky Draw winners</Link>}
         <span className="text-xs text-bone/60">{staff.name} · {staff.role.replace('_', ' ')}</span>
         <form action={logout} className="ml-auto"><button className="btn-ghost">Sign out</button></form>

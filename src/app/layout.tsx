@@ -5,7 +5,9 @@ import Link from 'next/link';
 import './globals.css';
 import { AnnouncementBar } from '@/components/AnnouncementBar';
 import { LuckyDrawPopup } from '@/components/LuckyDrawPopup';
+import { SponsorBanner } from '@/components/SponsorBanner';
 import { getBanner } from '@/data/db';
+import { loadBanner } from '@/data/sponsors';
 
 const display = Barlow_Condensed({ subsets: ['latin'], weight: ['700', '800'], style: ['italic'], variable: '--font-display' });
 const body = Inter({ subsets: ['latin'], variable: '--font-body' });
@@ -20,13 +22,13 @@ export const viewport: Viewport = { themeColor: '#07090b', width: 'device-width'
 
 const NAV = [
   ['/fixtures', 'Fixtures'], ['/tables', 'Tables'], ['/knockouts', 'Knockouts'], ['/teams', 'Teams'],
-  ['/players', 'Players'], ['/live', 'Live'], ['/tv', 'TV Mode'], ['/lucky-draw', 'Lucky Draw'], ['/rules', 'Rules'], ['/about', 'About'],
+  ['/players', 'Players'], ['/live', 'Live'], ['/tv', 'TV Mode'], ['/lucky-draw', 'Lucky Draw'], ['/sponsors', 'Sponsors'], ['/rules', 'Rules'], ['/about', 'About'],
 ] as const;
 
 export const dynamic = 'force-dynamic'; // the announcement banner is read per request
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const banner = await getBanner();
+  const [banner, sponsorBanner] = await Promise.all([getBanner(), loadBanner()]);
   return (
     <html lang="en-ZA" className={`${display.variable} ${body.variable}`}>
       <body>
@@ -55,6 +57,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </p>
           </div>
         </footer>
+        <SponsorBanner initial={sponsorBanner} />
         <LuckyDrawPopup />
       </body>
     </html>

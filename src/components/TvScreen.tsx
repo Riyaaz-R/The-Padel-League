@@ -6,6 +6,7 @@ import { useSnapshot } from '@/lib/use-snapshot';
 import { FixtureLive, activeFixtures } from './LiveBoard';
 import { LuckyDrawBar } from './LuckyDrawBar';
 import { Marquee } from './Marquee';
+import { SponsorMarquee } from './SponsorMarquee';
 import type { Snapshot, SnapTableRow } from '@/lib/snapshot';
 
 const SCENES = ['live', 'standings', 'next', 'results', 'bracket'] as const;
@@ -134,6 +135,7 @@ export function TvScreen({ fixedScene, scale }: { fixedScene?: string; scale?: n
         </div>
         {snap.announcement && <Marquee text={snap.announcement} className="mt-[1vh] rounded-xl bg-lime py-[0.5vh] text-[2.4vh] font-bold uppercase tracking-wide text-ink" />}
         <LuckyDrawBar today={snap.today} winners={snap.winners} />
+        {snap.sponsorBanner.enabled && snap.sponsorBanner.items.length > 0 && <SponsorMarquee items={snap.sponsorBanner.items} speed={snap.sponsorBanner.speed} className="sp-tv" />}
       </div>
     </div>
   );

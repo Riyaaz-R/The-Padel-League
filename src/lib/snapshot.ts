@@ -2,6 +2,7 @@ import 'server-only';
 import { fixtureTotals, groupTables, toRecord } from '@/data/derive';
 import { loadState } from '@/data/db';
 import { loadWinners } from '@/data/winners';
+import { loadBanner, type BannerView } from '@/data/sponsors';
 import { SLOTS, type AppState, type FixtureState, type LiveState, type PlayerRow, type TeamRow } from '@/data/store';
 import { pairingPoints } from '@/domain/scoring';
 import { bracket } from '@/data/derive';
@@ -17,7 +18,7 @@ export interface SnapFixture {
 }
 export interface SnapTableRow { teamId: string; name: string; logo: string; pos: number; played: number; setsDiff: number; gamesDiff: number; points: number; note?: string }
 export interface Snapshot {
-  now: string; today: string; tvScene?: string; announcement?: string; winners: { week: number; name: string }[];
+  now: string; today: string; tvScene?: string; announcement?: string; winners: { week: number; name: string }[]; sponsorBanner: BannerView;
   fixtures: SnapFixture[]; tables: { A: SnapTableRow[]; B: SnapTableRow[] };
   bracket: { slot: string; home?: string; away?: string; homeLabel: string; awayLabel: string }[];
   teams: Record<string, { name: string; logo: string }>;
@@ -40,14 +41,14 @@ function snapFixture(f: FixtureState, players: PlayerRow[], teams: TeamRow[]): S
 }
 
 export async function snapshot(): Promise<Snapshot> {
-  const [s, winners]: [AppState, Awaited<ReturnType<typeof loadWinners>>] = await Promise.all([loadState(), loadWinners()]);
+  const [s, winners, sponsorBanner]: [AppState, Awaited<ReturnType<typeof loadWinners>>, BannerView] = await Promise.all([loadState(), loadWinners(), loadBanner()]);
   const tables = groupTables(s);
   const row = (r: ReturnType<typeof groupTables>['A']['rows'][number]): SnapTableRow => ({
     teamId: r.teamId, name: tm(s.teams, r.teamId).name, logo: tm(s.teams, r.teamId).logo, pos: r.pos,
     played: r.played, setsDiff: r.setsW - r.setsL, gamesDiff: r.gamesW - r.gamesL, points: r.points - r.penalty, note: r.note,
   });
   return {
-    now: new Date().toISOString(), today: todaySAST(), tvScene: s.tvScene, announcement: s.announcement, winners: winners.map((w) => ({ week: w.week, name: w.name })),
+    now: new Date().toISOString(), today: todaySAST(), tvScene: s.tvScene, announcement: s.announcement, winners: winners.map((w) => ({ week: w.week, name: w.name })), sponsorBanner,
     fixtures: s.fixtures.map((f) => snapFixture(f, s.players, s.teams)), tables: { A: tables.A.rows.map(row), B: tables.B.rows.map(row) },
     bracket: bracket(s), teams: Object.fromEntries(s.teams.map((t) => [t.id, { name: t.name, logo: t.logo }])),
   };

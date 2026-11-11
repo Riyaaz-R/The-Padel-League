@@ -57,3 +57,33 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .fade-in { animation: fade-in 600ms ease-out; }
 @keyframes fade-in { from { opacity: 0; transform: translateY(0.6vh); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .fade-in { animation: none; } }
+
+/* Sponsor ticker (bottom of the screen) */
+.sp-bar { --sp-h: 44px; --sp-logo-h: 28px; font-size: 14px; height: var(--sp-h); overflow: hidden; display: flex; align-items: center; background: #101418; border-top: 2px solid #C6F000; color: #f2f0e8; }
+.sp-track { display: flex; width: max-content; animation: sp-scroll var(--dur, 30s) linear infinite; will-change: transform; }
+.sp-copy { display: flex; flex-shrink: 0; align-items: center; }
+@keyframes sp-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.sp-item { display: inline-flex; align-items: center; gap: 0.6em; padding: 0 1.1em; white-space: nowrap; font-weight: 600; }
+.sp-link:hover .sp-msg, .sp-link:focus-visible .sp-msg { text-decoration: underline; text-decoration-color: #C6F000; text-underline-offset: 3px; }
+.sp-dot { color: #C6F000; margin-left: 1.1em; font-size: 0.8em; }
+.sp-logo { display: inline-flex; align-items: center; justify-content: center; height: var(--sp-logo-h); padding: 0 0.45em; border-radius: 0.4em; flex-shrink: 0; }
+.sp-logo img { height: calc(var(--sp-logo-h) - 0.5em); width: auto; max-width: 9em; object-fit: contain; }
+.sp-logo-light { background: #ffffff; }
+.sp-logo-dark { background: #0a0d10; border: 1px solid #2a323a; }
+.sp-fixed { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; padding-bottom: env(safe-area-inset-bottom); background: #101418; }
+.sp-spacer { height: calc(44px + env(safe-area-inset-bottom)); }
+@media (min-width: 768px) {
+  .sp-bar { --sp-h: 56px; --sp-logo-h: 38px; font-size: 17px; }
+  .sp-spacer { height: calc(56px + env(safe-area-inset-bottom)); }
+}
+/* pause on hover only where there is a real pointer; always pause while a link has keyboard focus */
+@media (hover: hover) { .sp-bar:hover .sp-track { animation-play-state: paused; } }
+.sp-bar:focus-within .sp-track { animation-play-state: paused; }
+/* TV screen: sized in vh so it scales from 720p to 4K */
+.sp-tv { --sp-h: 5.4vh; --sp-logo-h: 4vh; font-size: 2.5vh; border: 2px solid #C6F000; border-radius: 1.2vh; margin-top: 1vh; }
+/* reduce motion: a static strip the viewer can scroll sideways */
+@media (prefers-reduced-motion: reduce) {
+  .sp-track { animation: none; width: auto; }
+  .sp-bar { overflow-x: auto; }
+  .sp-copy[aria-hidden='true'] { display: none; }
+}
